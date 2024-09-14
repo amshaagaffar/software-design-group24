@@ -92,7 +92,7 @@ nav .menu a:hover{
 }
 
 .input-box{
-    background: #000000;
+    background: #ffffff;
     width: 100%;
     padding: 20px;
     box-sizing: border-box;
@@ -114,4 +114,22 @@ nav .menu a:hover{
     box-sizing: border-box;
     border: 1px solid #ccc;
     border-radius: 5px;
+}
+
+
+.input-box .submit-btn{
+    background: #000000;
+    color: #ffffff;
+    border-radius: 10px;
+    text-decoration: none;
+    padding: 10px 20px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+.input-box .submit-btn:hover{
+    box-shadow: 0 0 10px #5b00ff;
+    color: #ffffff;
 }

@@ -23,7 +23,37 @@
   </nav>
 </header>
 
+<div class="wrapper">
+  <form id="loginForm">
+    <h1>Login</h1>
 
+    <div class="input-box">
+      <div class="input-field">
+        <input type="email" id="email" aria-label="Email" placeholder="Email" required>
+        <input type="password" id="password" aria-label="Password" placeholder="Password" required>
+      </div>
+      <button type="submit" class="submit-btn">Login</button>
+    </div>
+  </form>
+</div>
+
+<script>
+  
+  document.getElementById('loginForm').addEventListener('submit', function(event) {
+    event.preventDefault(); // Prevent form from submitting normally
+
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+
+    // Simulating validation (replace with actual backend validation in the future)
+    if (email === "test@example.com" && password === "password123") {
+      // Redirect to the dashboard page
+      window.location.href = "dashboard.html";
+    } else {
+      alert("Invalid login credentials");
+    }
+  });
+</script>
 
 </body>
 </html>
