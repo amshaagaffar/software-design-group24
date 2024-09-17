@@ -28,14 +28,14 @@ input {
 
 button {
     padding: 10px 15px;
-    background-color: #28a745;
+    background-color: #5b00ff;
     color: white;
     border: none;
     cursor: pointer;
 }
 
 button:hover {
-    background-color: #218838;
+    background-color: #5b00ff;
 }
 /* Basic styling */
 body {
@@ -66,7 +66,7 @@ th, td {
 }
 
 th {
-    background-color: #28a745;
+    background-color: #5b00ff;
     color: white;
 }
 
