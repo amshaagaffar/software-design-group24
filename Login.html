@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Landing Page</title>
+  <title>Login</title>
   <link rel="stylesheet" href="Styles.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -18,6 +18,7 @@
     </div>
     <div class="menu">
       <a href="Home.html">Home</a>
+      <a href="Register.html">Register</a>
       <a href="Login.html">Login</a>
     </div>
   </nav>
@@ -31,6 +32,10 @@
       <div class="input-field">
         <input type="email" id="email" aria-label="Email" placeholder="Email" required>
         <input type="password" id="password" aria-label="Password" placeholder="Password" required>
+        <select aria-label="role" id="role" required>
+          <option value="user">User</option>
+          <option value="admin">Admin</option>
+        </select>
       </div>
       <button type="submit" class="submit-btn">Login</button>
     </div>
@@ -38,17 +43,21 @@
 </div>
 
 <script>
-  
   document.getElementById('loginForm').addEventListener('submit', function(event) {
     event.preventDefault(); // Prevent form from submitting normally
 
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
+    const role = document.getElementById('role').value;
 
     // Simulating validation (replace with actual backend validation in the future)
     if (email === "test@example.com" && password === "password123") {
-      // Redirect to the dashboard page
-      window.location.href = "dashboard.html";
+      // Redirect based on role
+      if (role === "admin") {
+        window.location.href = "admin_dashboard.html";
+      } else {
+        window.location.href = "user_dashboard.html";
+      }
     } else {
       alert("Invalid login credentials");
     }
