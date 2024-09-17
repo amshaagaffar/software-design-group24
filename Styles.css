@@ -61,6 +61,23 @@ nav .menu a:hover{
 .content .info p{
     color: #222222;
     margin-bottom: 30px;
+    justify-content: space-between;
+    display: flex;
+}
+
+#handpic {
+    display: flex;
+    height: 400px;
+    width: 400px;
+    float: left;
+    margin: 60px 100px;
+}
+
+.volunteercontent .info2{
+    color: #222222;
+    margin-bottom: 30px;
+    justify-content: space-between;
+    display: flex;
 }
 
 .content .register-btn{
@@ -73,12 +90,24 @@ nav .menu a:hover{
     letter-spacing: 2px;
     font-weight: bold;
 }
-
+.volunteercontent .volunteermatch-btn {
+    background: black;
+    color: #ffffff;
+    border-radius: 20px;
+    text-decoration: none;
+    padding: 10px 20px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-weight: bold;
+}
 .content .register-btn:hover{
     color: #ffffff;
     box-shadow: 0 0 20px #5b00ff;
 }
-
+.volunteercontent .volunteermatch-btn:hover{
+    color: #ffffff;
+    box-shadow: 0 0 20px #5b00ff;
+}
 .wrapper{
     width: 750px;
     margin: 80px auto;
