@@ -15,7 +15,14 @@ nav{
 
 }
 
+.menu-container {
+    display: flex; /* Ensure the menu and noti button are in the same row */
+    align-items: center;
+}
 
+.menu-container .menu{
+    margin-right: 10px;
+}
 
 nav .menu a {
     color: #000000;
@@ -222,7 +229,34 @@ nav .menu a:hover{
     margin-right: 50px;
 }
 
+.noti {
+    margin-left: 4px;
+    background: none;
+    border-radius: 50%;
+    width: 27px;
+    height: 27px;
+    display: flex; /* Enable flexbox */
+    justify-content: center; /* Horizontally center the icon */
+    align-items: center; /* Vertically center the icon */
+    margin-right: 30px;
+}
 
+.noti-button {
+    background-color: transparent;
+    height: 20px;
+    width: 20px;
+    margin-right: 1px;
+}
+
+.noti:hover {
+    box-shadow: 0px 0px 4px #5b00ff;
+
+}
+
+.noti:active {
+    box-shadow: 0px 0px 10px #5b00ff;
+
+}
 
 
 
