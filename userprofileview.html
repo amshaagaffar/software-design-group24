@@ -107,7 +107,6 @@
       // This function would be called when the page loads
       function displayProfileInfo() {
         // In a real application, you would fetch this data from a server
-        // For this example, we'll use placeholder data
         const profileData = {
           fullName: "John Doe",
           address1: "123 Main St",
@@ -124,22 +123,22 @@
         document.getElementById("fullName").textContent = profileData.fullName;
         document.getElementById("address1").textContent = profileData.address1;
         document.getElementById("address2").textContent =
-          profileData.address2 || "N/A";
+                profileData.address2 || "N/A";
         document.getElementById("city").textContent = profileData.city;
         document.getElementById("state").textContent = profileData.state;
         document.getElementById("zipcode").textContent = profileData.zipcode;
         document.getElementById("skills").textContent =
-          profileData.skills.join(", ");
+                profileData.skills.join(", ");
         document.getElementById("preferences").textContent =
-          profileData.preferences || "No preferences specified";
+                profileData.preferences || "No preferences specified";
         document.getElementById("availability").textContent =
-          profileData.availability.join(", ");
+                profileData.availability.join(", ");
       }
 
       // This function would redirect to the edit profile page
       function editProfile() {
-        // In a real application, this would redirect to your edit profile page
-        alert("Redirecting to edit profile page...");
+        // Redirect to user.profile.html
+        window.location.href = "userprofile.html";
       }
 
       // Call the display function when the page loads

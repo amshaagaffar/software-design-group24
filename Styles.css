@@ -205,11 +205,14 @@ nav .menu a:hover{
     text-transform: uppercase;
     letter-spacing: 2px;
     font-weight: bold;
+    display: inline-block; /* Ensure it's treated as a block for responsiveness */
+    max-width: 200px; /* Set a max width for buttons */
+    width: 100%; /* Allow it to take full width in smaller screens */
+    text-align: center; /* Center text */
 }
 
 .content-right .register-btn:hover {
-    color: #ffffff;
-    box-shadow: 0 0 20px #5b00ff;
+    box-shadow: 0 0 40px #5b00ff;
 }
 
 .home-picture-right {
@@ -228,6 +231,8 @@ nav .menu a:hover{
     box-shadow: 0px 0px 15px #5b00ff;
     margin-right: 50px;
 }
+
+
 
 .noti {
     margin-left: 4px;
@@ -279,16 +284,15 @@ nav .menu a:hover{
         margin-top: 20px;
     }
 
-    .circular_image {
-        max-width: 300px;
-    }
-    .home-picture-right {
-        margin-left: 0;
-        margin-top: 20px;
-    }
-
+    .circular_image,
     .circular_image-right {
         max-width: 300px;
+    }
+
+    .content .register-btn,
+    .content-right .register-btn {
+        padding: 10px; /* Adjust padding for smaller screens */
+        max-width: none; /* Allow full width */
     }
 }
 
