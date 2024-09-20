@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>User Profile Display</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        line-height: 1.6;
+        margin: 0;
+        padding: 20px;
+        background-color: #f4f4f4;
+      }
+      .container {
+        max-width: 600px;
+        margin: auto;
+        background: white;
+        padding: 20px;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+      h1 {
+        text-align: center;
+        color: #333;
+      }
+      .profile-info {
+        display: grid;
+        gap: 15px;
+      }
+      .info-item {
+        border-bottom: 1px solid #eee;
+        padding-bottom: 10px;
+      }
+      .info-item:last-child {
+        border-bottom: none;
+      }
+      .label {
+        font-weight: bold;
+        color: #555;
+      }
+      .value {
+        margin-top: 5px;
+      }
+      .edit-button {
+        display: block;
+        width: 100%;
+        padding: 10px;
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+        margin-top: 20px;
+      }
+      .edit-button:hover {
+        background-color: #45a049;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>User Profile</h1>
+      <div class="profile-info">
+        <div class="info-item">
+          <div class="label">Full Name:</div>
+          <div class="value" id="fullName"></div>
+        </div>
+        <div class="info-item">
+          <div class="label">Address 1:</div>
+          <div class="value" id="address1"></div>
+        </div>
+        <div class="info-item">
+          <div class="label">Address 2:</div>
+          <div class="value" id="address2"></div>
+        </div>
+        <div class="info-item">
+          <div class="label">City:</div>
+          <div class="value" id="city"></div>
+        </div>
+        <div class="info-item">
+          <div class="label">State:</div>
+          <div class="value" id="state"></div>
+        </div>
+        <div class="info-item">
+          <div class="label">Zip code:</div>
+          <div class="value" id="zipcode"></div>
+        </div>
+        <div class="info-item">
+          <div class="label">Skills:</div>
+          <div class="value" id="skills"></div>
+        </div>
+        <div class="info-item">
+          <div class="label">Preferences:</div>
+          <div class="value" id="preferences"></div>
+        </div>
+        <div class="info-item">
+          <div class="label">Availability:</div>
+          <div class="value" id="availability"></div>
+        </div>
+      </div>
+      <button class="edit-button" onclick="editProfile()">Edit Profile</button>
+    </div>
+
+    <script>
+      // This function would be called when the page loads
+      function displayProfileInfo() {
+        // In a real application, you would fetch this data from a server
+        // For this example, we'll use placeholder data
+        const profileData = {
+          fullName: "John Doe",
+          address1: "123 Main St",
+          address2: "Apt 4B",
+          city: "Anytown",
+          state: "CA",
+          zipcode: "12345",
+          skills: ["HTML", "CSS", "JavaScript"],
+          preferences: "I prefer working on front-end development projects.",
+          availability: ["2024-09-20", "2024-09-21", "2024-09-22"],
+        };
+
+        // Populate the profile information
+        document.getElementById("fullName").textContent = profileData.fullName;
+        document.getElementById("address1").textContent = profileData.address1;
+        document.getElementById("address2").textContent =
+          profileData.address2 || "N/A";
+        document.getElementById("city").textContent = profileData.city;
+        document.getElementById("state").textContent = profileData.state;
+        document.getElementById("zipcode").textContent = profileData.zipcode;
+        document.getElementById("skills").textContent =
+          profileData.skills.join(", ");
+        document.getElementById("preferences").textContent =
+          profileData.preferences || "No preferences specified";
+        document.getElementById("availability").textContent =
+          profileData.availability.join(", ");
+      }
+
+      // This function would redirect to the edit profile page
+      function editProfile() {
+        // In a real application, this would redirect to your edit profile page
+        alert("Redirecting to edit profile page...");
+      }
+
+      // Call the display function when the page loads
+      window.onload = displayProfileInfo;
+    </script>
+  </body>
+</html>
+Last edited just now
