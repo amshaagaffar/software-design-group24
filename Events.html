@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Event Management</title>
+    <link rel="stylesheet" href="Styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+</head>
+
+<body>
+<header>
+    <nav>
+        <div class="logo">
+            GROUP 24
+        </div>
+        <div class="menu">
+            <a href="Events.html">Home</a>
+            <a href="Register.html">Register</a>
+            <a href="Login.html">Login</a>
+        </div>
+    </nav>
+</header>
+
+<div class="wrapper">
+  <form action="#">
+        <h1>Event Management Form</h1>
+        <div class="input-box">
+            <div class="input-field">
+                <input type="text" aria-label="Event Name" placeholder="Event Name" required maxlength="100">
+            </div>
+            <div class="input-field">
+                <textarea aria-label="Event Description" placeholder="Event Description" required></textarea>
+            </div>
+            <div class="input-field">
+                <textarea aria-label="Location" placeholder="Location" required></textarea>
+            </div>
+            <div class="input-field">
+                <select aria-label="Required Skills" multiple required>
+                    <option value="Programming">Programming</option>
+                    <option value="Design">Design</option>
+                    <option value="Marketing">Marketing</option>
+                    <option value="Management">Management</option>
+                    <option value="Communication">Communication</option>
+                </select>
+            </div>
+            <div class="input-field">
+                <select aria-label="Urgency" required>
+                    <option value="">Select Urgency</option>
+                    <option value="Low">Low</option>
+                    <option value="Medium">Medium</option>
+                    <option value="High">High</option>
+                </select>
+            </div>
+            <div class="input-field">
+                <input type="date" aria-label="Event Date" required>
+            </div>
+        </div>
+        <button type="submit" class="submit-btn">Create Event</button>
+  </form>
+</div>
+
+</body>
+</html>
