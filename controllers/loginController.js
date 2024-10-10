@@ -42,9 +42,9 @@ exports.loginUser = async (req, res) => {
     try {
         if (await bcrypt.compare(req.body.password, user.password)) {
             if (user.role === 'admin') {
-                res.redirect('/admin-dashboard'); // Redirect admin users
+                res.redirect('/admin_dashboard.html'); // Redirect admin users
             } else {
-                res.redirect('/volunteer-dashboard'); // Redirect volunteer users
+                res.redirect('/user_dashboard.html'); // Redirect volunteer users
             }
         } else {
             res.send('Login Denied');
