@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Login</title>
+  <link rel="stylesheet" href="Styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+<header>
+  <nav>
+    <div class="logo">
+      Hands2Help
+    </div>
+    <div class="menu">
+      <a href="Home.html">Home</a>
+      <a href="Register.html">Register</a>
+      <a href="Login.html">Login</a>
+    </div>
+  </nav>
+</header>
+
+<div class="wrapper">
+  <form id="login-form">
+    <h1>Login</h1>
+
+    <div class="input-box">
+      <div class="input-field">
+        <!-- Changed type="text" to type="email" and name="name" to name="email" -->
+        <label for="email">Email
+          <input type="email" placeholder="Enter Email" name="email" id="email" required>
+        </label>
+        <label for="password">Password
+          <input type="password" placeholder="Enter Password" name="password" id="password" required>
+        </label>
+      </div>
+      <button type="submit" class="submit-btn">Login</button>
+    </div>
+  </form>
+</div>
+<script>
+  document.getElementById('login-form').addEventListener('submit', async function (event) {
+    event.preventDefault(); // Prevent the default form submission
+
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+
+    try {
+      // Send login request to the server
+      const response = await fetch('/users/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Store the JWT token in localStorage
+        localStorage.setItem('token', data.token);
+
+        // Redirect the user based on their role
+        if (data.role === 'admin') {
+          window.location.href = '/admin_dashboard.html';
+        } else {
+          window.location.href = '/user_dashboard.html';
+        }
+      } else {
+        // Display error message if login failed
+        alert('Login failed: ' + data.message);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  });
+</script>
+</body>
+</html>
