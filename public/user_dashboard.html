@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="Styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900&display=swap" rel="stylesheet">
 </head>
 
 <body>
@@ -24,15 +24,58 @@
             </div>
 
             <button class="noti" id="notification-button">
-                <img src="/resources/notification-newdot-line.svg" alt="Notification" class="noti-button">
+                <img src="resources/notification-newdot-line.svg" alt="Notification" class="noti-button">
             </button>
+
+            <button id="signout-button" onclick="signOut()" class="signout-button">Sign Out</button>
         </div>
     </nav>
 </header>
 
+<div class="dashboard-content">
+    <h1>Welcome to your Dashboard!</h1>
+    <p id="user-email" class="user-email"></p> <!-- Placeholder for user email -->
+</div>
+
+<script>
 
 
+    function getUserInfo() {
+        const token = localStorage.getItem('token'); // Get token from localStorage
+        if (token) {
+            const payload = JSON.parse(atob(token.split('.')[1])); // Decode the JWT payload
+            const now = Date.now() / 1000; // Current time in seconds
 
-<script src="myscripts.js"></script>
+            // Check if the token is expired
+            if (payload.exp > now) {
+                return { email: payload.email, role: payload.role }; // Return email and role if valid
+            } else {
+                localStorage.removeItem('token'); // Remove expired token
+                alert('Your session has expired. Please log in again.');
+                window.location.href = 'Login.html'; // Redirect to login page
+            }
+        }
+        return null; // Return null if no token is found
+    }
+
+    // Display user email on the dashboard
+    const userInfo = getUserInfo();
+    if (userInfo) {
+        document.getElementById('user-email').textContent = 'Your Email: ' + userInfo.email; // Display email
+    } else {
+        document.getElementById('user-email').textContent = 'You are not logged in.';
+        window.location.href = 'Login.html'; // Redirect to login page if not logged in
+    }
+
+    // Sign out function
+    function signOut() {
+        localStorage.removeItem('token'); // Remove token from localStorage
+        alert('You have been signed out.');
+        window.location.href = 'Login.html'; // Redirect to login page
+    }
+
+
+</script>
+
 </body>
 </html>

@@ -1,7 +1,10 @@
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 const path = require('path');
 
-// In-memory storage for users (you may move this to a database later)
+const SECRET_KEY = 'your_secret_key'; // Replace with a stronger secret key
+
+// In-memory storage for users (move this to a database later)
 const users = [];
 
 // Serve the login page
@@ -13,7 +16,6 @@ exports.serveLoginPage = (req, res) => {
 exports.getAllUsers = (req, res) => {
     res.json(users);
 };
-
 
 exports.registerUser = async (req, res) => {
     try {
@@ -33,23 +35,42 @@ exports.registerUser = async (req, res) => {
     }
 };
 
-
 exports.loginUser = async (req, res) => {
     const user = users.find(user => user.email === req.body.email);
-    if (user == null) {
+    if (!user) {
         return res.status(400).send('Cannot find user');
     }
+
     try {
         if (await bcrypt.compare(req.body.password, user.password)) {
-            if (user.role === 'admin') {
-                res.redirect('/admin_dashboard.html'); // Redirect admin users
-            } else {
-                res.redirect('/user_dashboard.html'); // Redirect volunteer users
-            }
+            // Create a JWT token
+            const token = jwt.sign({ email: user.email, role: user.role }, SECRET_KEY, { expiresIn: '1h' });
+
+            // Send the JWT token and user role in the response
+            res.json({ message: 'Login successful', token: token, role: user.role });
         } else {
             res.send('Login Denied');
         }
     } catch {
         res.status(500).send();
+    }
+};
+
+// Middleware to verify JWT token for protected routes
+exports.authenticateJWT = (req, res, next) => {
+    const authHeader = req.headers.authorization;
+
+    if (authHeader) {
+        const token = authHeader.split(' ')[1];
+
+        jwt.verify(token, SECRET_KEY, (err, user) => {
+            if (err) {
+                return res.sendStatus(403); // Token is invalid
+            }
+            req.user = user; // Store user info in the request object
+            next(); // Proceed to the next middleware/route handler
+        });
+    } else {
+        res.sendStatus(401); // No token found
     }
 };

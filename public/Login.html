@@ -25,7 +25,7 @@
 </header>
 
 <div class="wrapper">
-  <form action="http://localhost:3000/users/login" method="POST">
+  <form id="login-form">
     <h1>Login</h1>
 
     <div class="input-box">
@@ -42,6 +42,43 @@
     </div>
   </form>
 </div>
+<script>
+  document.getElementById('login-form').addEventListener('submit', async function (event) {
+    event.preventDefault(); // Prevent the default form submission
 
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+
+    try {
+      // Send login request to the server
+      const response = await fetch('/users/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Store the JWT token in localStorage
+        localStorage.setItem('token', data.token);
+
+        // Redirect the user based on their role
+        if (data.role === 'admin') {
+          window.location.href = '/admin_dashboard.html';
+        } else {
+          window.location.href = '/user_dashboard.html';
+        }
+      } else {
+        // Display error message if login failed
+        alert('Login failed: ' + data.message);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  });
+</script>
 </body>
 </html>

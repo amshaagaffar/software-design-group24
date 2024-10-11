@@ -3,7 +3,7 @@
 Installation:
 ```
 
-npm i express bcrypt
+npm i express bcrypt jsonwebtoken
 
 npm i --save-dev nodemon
 ```
