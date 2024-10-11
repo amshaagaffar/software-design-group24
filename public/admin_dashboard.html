@@ -27,6 +27,9 @@
     <button class="noti" id="notification-button">
       <img src="resources/notification-newdot-line.svg" alt="Notification" class="noti-button">
   </button>
+
+
+      <button id="signout-button" onclick="signOut()" class="signout-button">Sign Out</button>
 </div>
   </nav>
 </header>
@@ -38,7 +41,7 @@
 
 <!--delete comment in script to get user session login to work-->
 <script>
-
+/*
 
   function getUserInfo() {
     const token = localStorage.getItem('token'); // Get token from localStorage
@@ -67,6 +70,14 @@
     window.location.href = 'Login.html'; // Redirect to login page if not logged in
   }
 
+  // Sign out function
+  function signOut() {
+    localStorage.removeItem('token'); // Remove token from localStorage
+    alert('You have been signed out.');
+    window.location.href = 'Login.html'; // Redirect to login page
+  }
+
+*/
 </script>
 
 
