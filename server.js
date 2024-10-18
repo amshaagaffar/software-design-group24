@@ -1,7 +1,9 @@
+// #file:server.js
 const express = require('express');
+const path = require('path');
 const app = express();
 
-// Import login routes and notification routes
+// Import login and other necessary routes
 const loginRoutes = require('./routes/login'); // Adjust path as necessary
 const notificationRoutes = require('./routes/notificationRoutes'); // Adjust path as necessary
 
@@ -15,6 +17,13 @@ app.use(loginRoutes);
 // Use notification routes
 app.use(notificationRoutes);
 
-app.listen(3000, () => {
-    console.log('Server is running on port 3000');
+// Serve volunteerhistory.html
+app.get('/volunteerhistory.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'volunteerhistory.html'));
+});
+
+// Start the server
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
 });

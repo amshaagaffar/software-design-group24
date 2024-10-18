@@ -1,3 +1,4 @@
+<!-- #file:user_dashboard.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,7 +12,6 @@
 </head>
 
 <body>
-
 <header>
     <nav>
         <div class="logo">
@@ -34,122 +34,133 @@
 </header>
 
 <div class="dashboard-content">
-    <h1>Welcome to your Dashboard!</h1>
-    <p id="user-email" class="user-email"></p> <!-- Placeholder for user email -->
-  </div>
-  
-  <script>
-  
-      // Get user info from JWT token
-      function getUserInfo() {
-          const token = localStorage.getItem('token'); // Get token from localStorage
-          if (token) {
-              const payload = JSON.parse(atob(token.split('.')[1])); // Decode the JWT payload
-              const now = Date.now() / 1000; // Current time in seconds
-  
-              // Check if the token is expired
-              if (payload.exp > now) {
-                  return { email: payload.email, role: payload.role }; // Return email and role if valid
-              } else {
-                  localStorage.removeItem('token'); // Remove expired token
-                  alert('Your session has expired. Please log in again.');
-                  window.location.href = 'Login.html'; // Redirect to login page
-              }
-          }
-          return null; // Return null if no token is found
-      }
-  
-      // Display user email on the dashboard
-      const userInfo = getUserInfo();
-      if (userInfo) {
-          document.getElementById('user-email').textContent = 'Your Email: ' + userInfo.email; // Display email
-      } else {
-          document.getElementById('user-email').textContent = 'You are not logged in.';
-          window.location.href = 'Login.html'; // Redirect to login page if not logged in
-      }
-  
-      // Sign out function
-      function signOut() {
-          localStorage.removeItem('token'); // Remove token from localStorage
-          alert('You have been signed out.');
-          window.location.href = 'Login.html'; // Redirect to login page
-      }
-  
-      // Load sections dynamically
-      function loadSection(fileName) {
-          // Fetch the external HTML file content
-          fetch(fileName)
-              .then(response => response.text())
-              .then(data => {
-                  // Insert the content into the container
-                  document.getElementById('section-container').innerHTML = data;
-              })
-              .catch(error => console.log('Error loading section', error));
-      }
-  
-  
-  </script>
-  
-  <script>
-  
-      // Create a variable to track whether notifications are shown
-      let notificationsVisible = false;
-  
-      // Event listener for the notification button
-      document.getElementById('notification-button').addEventListener('click', function() {
-          if (!notificationsVisible) {
-              // Fetch notifications if they're not already visible
-              fetch('/notifications')
-                  .then(response => response.json())
-                  .then(notifications => {
-                      displayNotifications(notifications); // Display the notifications
-                      notificationsVisible = true; // Set visibility to true
-                  })
-                  .catch(error => console.log('Error fetching notifications:', error));
-          } else {
-              // Hide notifications if they are currently visible
-              hideNotifications();
-              notificationsVisible = false; // Set visibility to false
-          }
-      });
-  
-      // Function to display notifications
-      function displayNotifications(notifications) {
-          // Create a container for notifications if it doesn't exist
-          let notificationContainer = document.getElementById('notification-container');
-          if (!notificationContainer) {
-              notificationContainer = document.createElement('div');
-              notificationContainer.id = 'notification-container';
-              notificationContainer.className = 'notification-container';
-              document.body.appendChild(notificationContainer);
-          }
-  
-          // Clear any existing notifications
-          notificationContainer.innerHTML = '';
-  
-          // Add each notification to the container
-          notifications.forEach(notification => {
-              const notificationElement = document.createElement('div');
-              notificationElement.className = 'notification-item';
-              notificationElement.textContent = notification.message;
-              notificationContainer.appendChild(notificationElement);
-          });
-  
-          // Show the notification container
-          notificationContainer.style.display = 'block';
-      }
-  
-      // Function to hide notifications
-      function hideNotifications() {
-          const notificationContainer = document.getElementById('notification-container');
-          if (notificationContainer) {
-              notificationContainer.style.display = 'none'; // Hide the container
-          }
-      }
-  
-  
-  </script>
-  
-  
-  </body>
-  </html>
+    <div class="dash-header">
+        <h1>Welcome to your Dashboard!</h1>
+        <p id="user-email" class="user-email"><!-- Placeholder for user email --></p>
+    </div>
+
+    <div class="dashboard-navigation">
+        <ul>
+            <li><a href="#" onclick="loadSection('Events.html')">Event Management</a></li>
+            <li><a href="#" onclick="loadSection('volunteermatch.html')">Volunteer Matching</a></li>
+            <li><a href="#" onclick="loadSection('volunteerhistory.html')">Volunteer History</a></li>
+        </ul>
+    </div>
+
+    <div id="section-container" class="section-container">
+        <!-- Content will be loaded here -->
+    </div>
+</div>
+
+<!-- JavaScript -->
+<script>
+    // Get user info from JWT token
+    function getUserInfo() {
+        const token = localStorage.getItem('token'); // Get token from localStorage
+        if (token) {
+            const payload = JSON.parse(atob(token.split('.')[1])); // Decode the JWT payload
+            const now = Date.now() / 1000; // Current time in seconds
+
+            // Check if the token is expired
+            if (payload.exp > now) {
+                return { email: payload.email, role: payload.role }; // Return email and role if valid
+            } else {
+                localStorage.removeItem('token'); // Remove expired token
+                alert('Your session has expired. Please log in again.');
+                window.location.href = 'Login.html'; // Redirect to login page
+            }
+        }
+        return null; // Return null if no token is found
+    }
+
+    // Display user email on the dashboard
+    const userInfo = getUserInfo();
+    if (userInfo) {
+        document.getElementById('user-email').textContent = 'Your Email: ' + userInfo.email; // Display email
+    } else {
+        document.getElementById('user-email').textContent = 'You are not logged in.';
+        window.location.href = 'Login.html'; // Redirect to login page if not logged in
+    }
+
+    // Sign out function
+    function signOut() {
+        localStorage.removeItem('token'); // Remove token from localStorage
+        alert('You have been signed out.');
+        window.location.href = 'Login.html'; // Redirect to login page
+    }
+
+    // Load sections dynamically
+    function loadSection(fileName) {
+        // Fetch the external HTML file content
+        fetch(fileName)
+            .then(response => response.text())
+            .then(data => {
+                // Insert the content into the container
+                document.getElementById('section-container').innerHTML = data;
+
+                // Call function to fetch volunteer history if loading the volunteer history section
+                if (fileName === 'volunteerhistory.html') {
+                    fetchVolunteerHistory();
+                }
+            })
+            .catch(error => console.log('Error loading section', error));
+    }
+
+    // Function to fetch volunteer history
+    function fetchVolunteerHistory() {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            alert('You are not authenticated. Please log in.');
+            window.location.href = 'Login.html'; // Redirect to login if no token
+            return;
+        }
+
+        fetch('/volunteerhistory', {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message) {
+                    alert(data.message);
+                    return;
+                }
+
+                const tbody = document.getElementById("volunteer-history");
+                data.forEach(event => {
+                    const row = document.createElement("tr");
+                    row.innerHTML = `
+                    <td>${event.eventName}</td>
+                    <td>${event.eventDescription}</td>
+                    <td>${event.location}</td>
+                    <td>${event.requiredSkills.join(", ")}</td>
+                    <td>${event.urgency}</td>
+                    <td>${event.eventDate}</td>
+                    <td>${event.participationStatus}</td>
+                `;
+                    tbody.appendChild(row);
+                });
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // No default section to load on page load
+    });
+</script>
+
+<script>
+    // Create a variable to track whether notifications are shown
+    let notificationsVisible = false;
+
+    // Event listener for the notification button
+    document.getElementById('notification-button').addEventListener('click', function () {
+        notificationsVisible = !notificationsVisible;
+        // Show or hide notifications based on the current state
+        // (The implementation for showing/hiding notifications is assumed to be elsewhere in your code)
+        alert(notificationsVisible ? 'Notifications Shown' : 'Notifications Hidden');
+    });
+</script>
+</body>
+</html>

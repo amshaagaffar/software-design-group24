@@ -1,3 +1,5 @@
+// #file:loginController.js
+
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const path = require('path');
@@ -17,6 +19,7 @@ exports.getAllUsers = (req, res) => {
     res.json(users);
 };
 
+// Register a new user
 exports.registerUser = async (req, res) => {
     try {
         // Check if a user with the same email already exists
@@ -35,6 +38,7 @@ exports.registerUser = async (req, res) => {
     }
 };
 
+// Log in a user
 exports.loginUser = async (req, res) => {
     const user = users.find(user => user.email === req.body.email);
     if (!user) {
@@ -54,6 +58,34 @@ exports.loginUser = async (req, res) => {
     } catch {
         res.status(500).send();
     }
+};
+
+// Get volunteer history for a logged-in user
+exports.getVolunteerHistory = (req, res) => {
+    // Simulated data for demonstration; replace with database query results
+    const volunteerHistory = [
+        {
+            eventName: "Health Awareness Camp",
+            eventDescription: "A public event to spread awareness about health and wellness.",
+            location: "Community Hall",
+            requiredSkills: ["First Aid", "Communication"],
+            urgency: "High",
+            eventDate: "2024-09-30",
+            participationStatus: "Completed"
+        },
+        {
+            eventName: "Fundraising Gala",
+            eventDescription: "A fundraising event to raise money for local charities.",
+            location: "City Conference Center",
+            requiredSkills: ["Event Planning", "Public Speaking"],
+            urgency: "Medium",
+            eventDate: "2024-10-01",
+            participationStatus: "Attended"
+        }
+    ];
+
+    // Send the volunteer history data as the response
+    res.json(volunteerHistory);
 };
 
 // Middleware to verify JWT token for protected routes
