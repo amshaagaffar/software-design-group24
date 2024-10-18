@@ -1,0 +1,76 @@
+<!-- #file:volunteerhistory.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Volunteer History</title>
+    <link rel="stylesheet" href="styles2.css">
+</head>
+<body>
+<h1>Volunteer Participation History</h1>
+
+<table>
+    <thead>
+    <tr>
+        <th>Event Name</th>
+        <th>Event Description</th>
+        <th>Location</th>
+        <th>Required Skills</th>
+        <th>Urgency</th>
+        <th>Event Date</th>
+        <th>Participation Status</th>
+    </tr>
+    </thead>
+    <tbody id="volunteer-history">
+    <!-- Rows will be dynamically populated here -->
+    </tbody>
+</table>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const token = localStorage.getItem('token');
+
+        if (!token) {
+            window.location.href = '/login.html'; // Redirect to login if no token
+            return;
+        }
+
+        fetch('/volunteerhistory', {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message) {
+                    alert(data.message);
+                    return;
+                }
+
+                const tbody = document.getElementById("volunteer-history");
+
+                data.forEach(event => {
+                    const row = document.createElement("tr");
+
+                    row.innerHTML = `
+                        <td>${event.eventName}</td>
+                        <td>${event.eventDescription}</td>
+                        <td>${event.location}</td>
+                        <td>${event.requiredSkills.join(", ")}</td>
+                        <td>${event.urgency}</td>
+                        <td>${event.eventDate}</td>
+                        <td>${event.participationStatus}</td>
+                    `;
+
+                    tbody.appendChild(row);
+                });
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    });
+</script>
+</body>
+</html>
