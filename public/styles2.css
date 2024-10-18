@@ -1,7 +1,7 @@
 /* Basic styling */
 body {
     font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
+
     padding: 20px;
 }
 
@@ -40,7 +40,6 @@ button:hover {
 /* Basic styling */
 body {
     font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
     padding: 20px;
 }
 
@@ -67,7 +66,7 @@ th, td {
 
 th {
     background-color: #5b00ff;
-    color: white;
+    color: #fffdfd;
 }
 
 td {
@@ -76,4 +75,30 @@ td {
 
 tbody tr:nth-child(even) td {
     background-color: #f9f9f9;
+}
+
+
+.signout-button{
+    border: black 1px solid;
+    background-color: transparent;
+    border-radius: 10px;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    color: black;
+}
+
+.signout-button:hover{
+    box-shadow: 0 0 5px #5b00ff;
+    background-color: #fffdfd;
+}
+
+.signout-button:active { /* Corrected selector */
+    box-shadow: 0 0 10px #5b00ff;
+}
+
+
+.section-container form{
+    margin-top: 30px;
 }
