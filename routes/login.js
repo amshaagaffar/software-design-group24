@@ -1,7 +1,8 @@
-// #file:login.js
+// #file: login.js
 const express = require('express');
 const router = express.Router();
 const loginController = require('../controllers/loginController');
+const userProfileController = require('../controllers/userProfileController'); // Import the user profile controller
 const path = require('path');
 
 // Serve the login page
@@ -27,5 +28,13 @@ router.get('/admin_dashboard.html', loginController.authenticateJWT, (req, res) 
 router.get('/user_dashboard.html', loginController.authenticateJWT, (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'public', 'user_dashboard.html'));
 });
+
+// Route to create or update user profile
+router.post('/userprofile', loginController.authenticateJWT, userProfileController.createOrUpdateUserProfile);
+
+// Route to get user profile
+router.get('/userprofile', loginController.authenticateJWT, userProfileController.getUserProfile);
+
+
 
 module.exports = router;
