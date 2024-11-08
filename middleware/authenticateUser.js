@@ -1,8 +1,4 @@
-// Hardcoded user data
-const users = {
-    token1: { userId: 'user1', email: 'user1@example.com', role: 'volunteer' },
-    token2: { userId: 'user2', email: 'user2@example.com', role: 'volunteer' },
-};
+
 
 //Middleware to simulate JWT authentication
 module.exports = (req, res, next) => {
