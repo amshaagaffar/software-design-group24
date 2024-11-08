@@ -122,6 +122,12 @@
       if (response.ok) {
         const profile = await response.json();
 
+        // Function to format and convert UTC date to local time
+        const formatDate = (dateString) => {
+          const date = new Date(dateString);
+          return date.toLocaleDateString();  // You can customize the format here
+        };
+
         // Populate the profile information in the read-only view
         document.getElementById('fullName').textContent = profile.fullName || 'N/A';
         document.getElementById('address1').textContent = profile.address1 || 'N/A';
@@ -131,7 +137,9 @@
         document.getElementById('zipcode').textContent = profile.zipcode || 'N/A';
         document.getElementById('skills').textContent = profile.skills ? profile.skills.join(', ') : 'N/A';
         document.getElementById('preferences').textContent = profile.preferences || 'N/A';
-        document.getElementById('availability').textContent = profile.availability || 'N/A';
+
+        // Format the availability date
+        document.getElementById('availability').textContent = profile.availability ? formatDate(profile.availability) : 'N/A';
       } else {
         console.error('Failed to fetch profile');
       }
