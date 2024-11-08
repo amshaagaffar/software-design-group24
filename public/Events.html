@@ -2,31 +2,52 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Event Management</title>
     <link rel="stylesheet" href="Styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
 
 <body>
+<header>
+    <nav>
+        <div class="logo">
+            Hands2Help
+        </div>
+
+        <div class="menu-container">
+            <div class="menu">
+                <a href="admin_dashboard.html">Dashboard</a>
+                <a href="userprofileview.html">Account</a>
+            </div>
+
+            <button class="noti" id="notification-button">
+                <img src="resources/notification-newdot-line.svg" alt="Notification" class="noti-button">
+            </button>
+
+            <button id="signout-button" onclick="signOut()" class="signout-button">Sign Out</button>
+        </div>
+    </nav>
+</header>
 
 <div class="event-wrapper">
     <div class="event-form-wrapper">
-        <form action="#">
+        <form id="event-form">
             <h1>Event Management Form</h1>
             <div class="event-input-box">
                 <div class="event-input-field">
-                    <input type="text" aria-label="Event Name" placeholder="Event Name" required maxlength="100">
+                    <input type="text" id="event-name" aria-label="Event Name" placeholder="Event Name" required maxlength="100">
                 </div>
                 <div class="event-input-field">
-                    <textarea aria-label="Event Description" placeholder="Event Description" required></textarea>
+                    <textarea id="event-description" aria-label="Event Description" placeholder="Event Description" required></textarea>
                 </div>
                 <div class="event-input-field">
-                    <textarea aria-label="Location" placeholder="Location" required></textarea>
+                    <textarea id="location" aria-label="Location" placeholder="Location" required></textarea>
                 </div>
                 <div class="event-input-field">
-                    <select aria-label="Required Skills" multiple required>
+                    <select id="required-skills" aria-label="Required Skills" multiple required>
                         <option value="Programming">Programming</option>
                         <option value="Design">Design</option>
                         <option value="Marketing">Marketing</option>
@@ -35,7 +56,7 @@
                     </select>
                 </div>
                 <div class="event-input-field">
-                    <select aria-label="Urgency" required>
+                    <select id="urgency" aria-label="Urgency" required>
                         <option value="">Select Urgency</option>
                         <option value="Low">Low</option>
                         <option value="Medium">Medium</option>
@@ -43,13 +64,66 @@
                     </select>
                 </div>
                 <div class="event-input-field">
-                    <input type="date" aria-label="Event Date" required>
+                    <input type="date" id="event-date" aria-label="Event Date" required>
                 </div>
             </div>
-            <button type="submit" class="event-submit-btn">Create Event</button>
+            <button type="submit" id="submit-btn" class="event-submit-btn">Create Event</button>
         </form>
     </div>
 </div>
 
+<script>
+    document.getElementById('event-form').addEventListener('submit', async function(event) {
+        event.preventDefault();
+
+        // Disable the submit button to prevent multiple submissions
+        const submitButton = document.getElementById('submit-btn');
+        submitButton.disabled = true;
+        submitButton.textContent = "Submitting...";
+
+        // Collect form data
+        const eventName = document.getElementById('event-name').value;
+        const eventDescription = document.getElementById('event-description').value;
+        const location = document.getElementById('location').value;
+        const requiredSkills = Array.from(document.getElementById('required-skills').selectedOptions).map(option => option.value);
+        const urgency = document.getElementById('urgency').value;
+        const eventDate = document.getElementById('event-date').value;
+
+        // Prepare the data to send
+        const eventData = {
+            eventName,
+            eventDescription,
+            location,
+            requiredSkills,
+            urgency,
+            eventDate
+        };
+
+        try {
+            const response = await fetch('/api/events', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(eventData)
+            });
+
+            const result = await response.json();
+            if (response.ok) {
+                alert('Event created successfully!');
+                // Optionally, reset the form after successful submission
+                document.getElementById('event-form').reset();
+            } else {
+                alert('Error creating event: ' + result.message);
+            }
+        } catch (error) {
+            alert('An error occurred: ' + error.message);
+        } finally {
+            // Re-enable the submit button
+            submitButton.disabled = false;
+            submitButton.textContent = "Create Event";
+        }
+    });
+</script>
 </body>
 </html>

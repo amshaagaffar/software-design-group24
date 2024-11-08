@@ -3,6 +3,7 @@ const express = require('express');
 const router = express.Router();
 const loginController = require('../controllers/loginController');
 const userProfileController = require('../controllers/userProfileController'); // Import the user profile controller
+const eventController = require('../controllers/eventController'); // Import the event controller
 const path = require('path');
 
 // Serve the login page
@@ -35,11 +36,15 @@ router.post('/userprofile', loginController.authenticateJWT, userProfileControll
 // Route to get user profile
 router.get('/userprofile', loginController.authenticateJWT, userProfileController.getUserProfile);
 
-// Route to get user profile
-router.get('/userprofile', loginController.authenticateJWT, userProfileController.getUserProfile);
+// Create an event
+router.post('/api/events', eventController.createEvent);
 
-// Route to create or update user profile
-router.post('/userprofile', loginController.authenticateJWT, userProfileController.createOrUpdateUserProfile);
+// Get all events
+router.get('/api/events', eventController.getAllEvents);
 
+// Other event-related routes (get, update, delete)
+router.get('/api/events/:id', eventController.getEventById);
+router.put('/api/events/:id', eventController.updateEvent);
+router.delete('/api/events/:id', eventController.deleteEvent);
 
 module.exports = router;

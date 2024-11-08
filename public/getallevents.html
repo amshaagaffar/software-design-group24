@@ -1,0 +1,62 @@
+<!-- #file: front_end/events.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>All Events</title>
+  <link rel="stylesheet" href="styles.css"> <!-- Link to your existing CSS -->
+  <script defer src="myscripts.js"></script> <!-- Link to your JavaScript file -->
+</head>
+<body>
+<div class="container">
+  <h1>All Events</h1>
+  <div id="events-list"></div> <!-- This is where events will be dynamically added -->
+</div>
+
+<script>
+  // Fetch all events from the server
+  async function fetchEvents() {
+    try {
+      const response = await fetch('/api/events');
+      if (response.ok) {
+        const events = await response.json();
+        displayEvents(events);
+      } else {
+        console.error('Error fetching events:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  }
+
+  // Function to display events in the HTML
+  function displayEvents(events) {
+    const eventsList = document.getElementById('events-list');
+    eventsList.innerHTML = ''; // Clear the current content
+
+    if (events.length === 0) {
+      eventsList.innerHTML = '<p>No events available</p>';
+      return;
+    }
+
+    events.forEach(event => {
+      const eventDiv = document.createElement('div');
+      eventDiv.classList.add('event');
+      eventDiv.innerHTML = `
+                    <h3>${event.eventName}</h3>
+                    <p><strong>Description:</strong> ${event.eventDescription}</p>
+                    <p><strong>Location:</strong> ${event.location}</p>
+                    <p><strong>Skills Required:</strong> ${event.requiredSkills.join(', ')}</p>
+                    <p><strong>Urgency:</strong> ${event.urgency}</p>
+                    <p><strong>Event Date:</strong> ${new Date(event.eventDate).toLocaleDateString()}</p>
+                `;
+      eventsList.appendChild(eventDiv);
+    });
+  }
+
+  // Fetch and display the events when the page loads
+  window.onload = fetchEvents;
+</script>
+</body>
+</html>

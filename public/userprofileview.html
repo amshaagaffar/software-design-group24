@@ -4,18 +4,19 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>User Profile View</title>
+  <link rel="stylesheet" href="Styles.css">
   <style>
     body {
       font-family: Arial, sans-serif;
       line-height: 1.6;
       margin: 0;
       padding: 20px;
-      background-color: #f4f4f4;
+      background-color: #ffffff;
     }
     .container {
       max-width: 600px;
       margin: auto;
-      background: white;
+      background: #ffffff;
       padding: 20px;
       border-radius: 5px;
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -63,6 +64,26 @@
   </style>
 </head>
 <body>
+<header>
+  <nav>
+    <div class="logo">
+      Hands2Help
+    </div>
+
+    <div class="menu-container">
+      <div class="menu">
+
+        <a href="userprofileview.html">Account</a>
+      </div>
+
+      <button class="noti" id="notification-button">
+        <img src="resources/notification-newdot-line.svg" alt="Notification" class="noti-button">
+      </button>
+
+      <button id="signout-button" onclick="signOut()" class="signout-button">Sign Out</button>
+    </div>
+  </nav>
+</header>
 <div class="container">
   <h1>User Profile</h1>
   <div class="profile-info">
