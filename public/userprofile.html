@@ -137,5 +137,69 @@
         </div>
       </form>
     </div>
+    <script>
+      document.addEventListener('DOMContentLoaded', async () => {
+        // Fetch the current user profile
+        try {
+          const response = await fetch('/userprofile', {
+            headers: {
+              'Authorization': `Bearer ${localStorage.getItem('token')}`
+            }
+          });
+          const profile = await response.json();
+
+          if (profile) {
+            document.getElementById('fullName').value = profile.fullName || '';
+            document.getElementById('address1').value = profile.address1 || '';
+            document.getElementById('address2').value = profile.address2 || '';
+            document.getElementById('city').value = profile.city || '';
+            document.getElementById('state').value = profile.state || '';
+            document.getElementById('zipcode').value = profile.zipcode || '';
+            document.getElementById('skills').value = profile.skills.join(', ') || '';
+            document.getElementById('preferences').value = profile.preferences || '';
+            document.getElementById('availability').value = profile.availability ? profile.availability.split('T')[0] : '';
+          }
+        } catch (err) {
+          console.error('Error fetching profile:', err);
+        }
+      });
+
+      async function saveProfile(event) {
+        event.preventDefault();
+
+        const profileData = {
+          fullName: document.getElementById('fullName').value,
+          address1: document.getElementById('address1').value,
+          address2: document.getElementById('address2').value,
+          city: document.getElementById('city').value,
+          state: document.getElementById('state').value,
+          zipcode: document.getElementById('zipcode').value,
+          skills: document.getElementById('skills').value,
+          preferences: document.getElementById('preferences').value,
+          availability: document.getElementById('availability').value
+        };
+
+        try {
+          const response = await fetch('/userprofile', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${localStorage.getItem('token')}`
+            },
+            body: JSON.stringify(profileData)
+          });
+
+          if (response.ok) {
+            alert('Profile updated successfully');
+          } else {
+            alert('Failed to update profile');
+          }
+        } catch (err) {
+          console.error('Error saving profile:', err);
+        }
+      }
+
+      document.querySelector('form').addEventListener('submit', saveProfile);
+    </script>
   </body>
 </html>

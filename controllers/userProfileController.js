@@ -1,54 +1,48 @@
 const UserProfile = require('../models/UserProfile');
-const UserCredentials = require('../models/UserCredentials'); // Import UserCredentials
+const UserCredentials = require('../models/UserCredentials');
 
-// Create or update user profile
-exports.createOrUpdateUserProfile = async (req, res) => {
-    const { fullName, address, city, state, zipcode, skills, preferences, availability } = req.body;
-
+// Get the user profile based on logged-in user's ID
+exports.getUserProfile = async (req, res) => {
     try {
-        // Find the user by email
-        const user = await UserCredentials.findOne({ email: req.user.email });
+        const userId = req.user.userId;
+        const profile = await UserProfile.findOne({ userId });
 
-        if (!user) {
-            return res.status(404).send('User not found');
+        if (!profile) {
+            return res.status(404).json({ message: 'Profile not found' });
         }
 
-        // Upsert the user profile
-        const profileData = {
-            userId: user._id,
-            fullName,
-            address,
-            city,
-            state,
-            zipcode,
-            skills,
-            preferences,
-            availability,
-        };
-
-        const userProfile = await UserProfile.findOneAndUpdate(
-            { userId: user._id },
-            profileData,
-            { new: true, upsert: true } // Create if not exists
-        );
-
-        res.json(userProfile);
-    } catch (error) {
-        console.error(error);
-        res.status(500).send('Internal Server Error');
+        res.json(profile);
+    } catch (err) {
+        res.status(500).send('Server error');
     }
 };
 
-// Get user profile by user ID
-exports.getUserProfile = async (req, res) => {
+// Create or update the user profile
+exports.createOrUpdateUserProfile = async (req, res) => {
     try {
-        const userProfile = await UserProfile.findOne({ userId: req.user.userId });
-        if (!userProfile) {
-            return res.status(404).send('User profile not found');
-        }
-        res.json(userProfile);
-    } catch (error) {
-        console.error(error);
-        res.status(500).send('Internal Server Error');
+        const userId = req.user.userId;
+
+        const profileData = {
+            userId,
+            fullName: req.body.fullName,
+            address1: req.body.address1,
+            address2: req.body.address2,
+            city: req.body.city,
+            state: req.body.state,
+            zipcode: req.body.zipcode,
+            skills: req.body.skills.split(','), // Convert skills from comma-separated string to array
+            preferences: req.body.preferences,
+            availability: req.body.availability
+        };
+
+        const profile = await UserProfile.findOneAndUpdate(
+            { userId },
+            profileData,
+            { new: true, upsert: true } // Create if not found, otherwise update
+        );
+
+        res.json({ message: 'Profile saved successfully', profile });
+    } catch (err) {
+        res.status(500).send('Server error');
     }
 };

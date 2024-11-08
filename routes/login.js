@@ -35,6 +35,11 @@ router.post('/userprofile', loginController.authenticateJWT, userProfileControll
 // Route to get user profile
 router.get('/userprofile', loginController.authenticateJWT, userProfileController.getUserProfile);
 
+// Route to get user profile
+router.get('/userprofile', loginController.authenticateJWT, userProfileController.getUserProfile);
+
+// Route to create or update user profile
+router.post('/userprofile', loginController.authenticateJWT, userProfileController.createOrUpdateUserProfile);
 
 
 module.exports = router;
