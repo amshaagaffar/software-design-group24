@@ -3,75 +3,91 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Volunteer Matching Form</title>
-    <!-- Link to external CSS file -->
-    <link rel="stylesheet" href="styles2.css">
-    <link rel="stylesheet" href="Styles.css">
+    <title>All Events</title>
+    <link rel="stylesheet" href="styles.css">
+    <script defer src="myscripts.js"></script>
 </head>
 <body>
-<header>
-    <nav>
-        <div class="logo">
-            Hands2Help
-        </div>
+<div class="container">
+    <h1>All Events</h1>
 
-        <div class="menu-container">
-            <div class="menu">
+    <!-- Button to filter events by skills -->
+    <button onclick="filterEventsBySkills()">Filter Events by Skills</button>
 
-                <a href="userprofileview.html">Account</a>
-            </div>
+    <div id="events-list"></div> <!-- This is where events will be dynamically added -->
+</div>
 
-            <button class="noti" id="notification-button">
-                <img src="resources/notification-newdot-line.svg" alt="Notification" class="noti-button">
-            </button>
+<script>
+    // Variable to store all fetched events
+    let allEvents = [];
 
-            <button id="signout-button" onclick="signOut()" class="signout-button">Sign Out</button>
-        </div>
-    </nav>
-</header>
-    <h1>Volunteer Matching Form</h1>
-
-    <!-- Form -->
-    <div class="form-group">
-        <label for="volunteerName">Volunteer Name:</label>
-        <input type="text" id="volunteerName" placeholder="Loading..." readonly>
-    </div>
-
-    <div class="form-group">
-        <label for="matchedEvent">Matched Event:</label>
-        <input type="text" id="matchedEvent" placeholder="Loading..." readonly>
-    </div>
-
-    <button type="button" onclick="matchVolunteer()">Match Volunteer</button>
-
-    <script>
-        // Simulated volunteer and event data (normally this would come from a database)
-        const volunteers = [
-            { id: 1, name: "John Doe", skills: "First Aid", availability: "2024-09-30" },
-            { id: 2, name: "Jane Smith", skills: "Event Planning", availability: "2024-10-01" }
-        ];
-
-        const events = [
-            { id: 1, name: "Health Awareness Camp", requirements: "First Aid", date: "2024-09-30" },
-            { id: 2, name: "Fundraising Gala", requirements: "Event Planning", date: "2024-10-01" }
-        ];
-
-        // Function to match volunteer with an event based on their profile
-        function matchVolunteer() {
-            // Simulate getting the first volunteer for this example (in practice, this would come from a database)
-            const volunteer = volunteers[0];  // Assuming we want to auto-fill for "John Doe"
-
-            // Display the volunteer's name in the form
-            document.getElementById("volunteerName").value = volunteer.name;
-
-            // Find a matching event based on the volunteer's skills and availability
-            const matchedEvent = events.find(event => 
-                event.requirements === volunteer.skills && event.date === volunteer.availability
-            );
-
-            // Display the matched event, or show "No match found"
-            document.getElementById("matchedEvent").value = matchedEvent ? matchedEvent.name : "No match found";
+    // Fetch all events from the server
+    async function fetchEvents() {
+        try {
+            const response = await fetch('/api/events');
+            if (response.ok) {
+                allEvents = await response.json();
+                displayEvents(allEvents);  // Display all events initially
+            } else {
+                console.error('Error fetching events:', response.statusText);
+            }
+        } catch (error) {
+            console.error('Error:', error);
         }
-    </script>
+    }
+
+    // Fetch and display events filtered by skills
+    function filterEventsBySkills() {
+        const userSkills = ['Skill1', 'Skill2', 'Skill3']; // Get the user's skills (replace with actual user data)
+
+        // Log the user skills
+        console.log("User Skills:", userSkills);
+
+        // Filter events based on skills match
+        const filteredEvents = allEvents.filter(event => {
+            // Log the event's required skills for debugging
+            console.log("Event Required Skills:", event.requiredSkills);
+
+            // Check if there's any match between user's skills and required skills (case-insensitive)
+            return event.requiredSkills.some(skill =>
+                userSkills.some(userSkill => userSkill.toLowerCase() === skill.toLowerCase())
+            );
+        });
+
+        // Log the filtered events
+        console.log("Filtered Events:", filteredEvents);
+
+        // Display filtered events
+        displayEvents(filteredEvents);
+    }
+
+    // Function to display events in the HTML
+    function displayEvents(events) {
+        const eventsList = document.getElementById('events-list');
+        eventsList.innerHTML = ''; // Clear the current content
+
+        if (events.length === 0) {
+            eventsList.innerHTML = '<p>No events available</p>';
+            return;
+        }
+
+        events.forEach(event => {
+            const eventDiv = document.createElement('div');
+            eventDiv.classList.add('event');
+            eventDiv.innerHTML = `
+                    <h3>${event.eventName}</h3>
+                    <p><strong>Description:</strong> ${event.eventDescription}</p>
+                    <p><strong>Location:</strong> ${event.location}</p>
+                    <p><strong>Skills Required:</strong> ${event.requiredSkills.join(', ')}</p>
+                    <p><strong>Urgency:</strong> ${event.urgency}</p>
+                    <p><strong>Event Date:</strong> ${new Date(event.eventDate).toLocaleDateString()}</p>
+                `;
+            eventsList.appendChild(eventDiv);
+        });
+    }
+
+    // Fetch and display the events when the page loads
+    window.onload = fetchEvents;
+</script>
 </body>
 </html>

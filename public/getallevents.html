@@ -1,27 +1,35 @@
-<!-- #file: front_end/events.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>All Events</title>
-  <link rel="stylesheet" href="styles.css"> <!-- Link to your existing CSS -->
-  <script defer src="myscripts.js"></script> <!-- Link to your JavaScript file -->
+  <title>Filtered Events by Skills</title>
+  <link rel="stylesheet" href="styles.css">
+  <script defer src="myscripts.js"></script>
 </head>
 <body>
 <div class="container">
-  <h1>All Events</h1>
+  <h1>Filtered Events by Skills</h1>
+
+  <!-- Input for user skills -->
+  <label for="userSkills">Enter your skills (comma separated):</label>
+  <input type="text" id="userSkills" placeholder="e.g., JavaScript, Python, HTML">
+  <button onclick="filterEventsBySkills()">Filter Events</button>
+
   <div id="events-list"></div> <!-- This is where events will be dynamically added -->
 </div>
 
 <script>
+  // Variable to store all fetched events
+  let allEvents = [];
+
   // Fetch all events from the server
   async function fetchEvents() {
     try {
       const response = await fetch('/api/events');
       if (response.ok) {
-        const events = await response.json();
-        displayEvents(events);
+        allEvents = await response.json();
+        displayEvents(allEvents);  // Display all events initially
       } else {
         console.error('Error fetching events:', response.statusText);
       }
@@ -30,13 +38,35 @@
     }
   }
 
+  // Filter events by user's skills
+  function filterEventsBySkills() {
+    const userSkillsInput = document.getElementById('userSkills').value;
+    const userSkills = userSkillsInput.split(',').map(skill => skill.trim().toLowerCase());
+
+    // Log the user skills to ensure they're formatted correctly
+    console.log('User Skills:', userSkills);
+
+    // Filter events based on matching skills
+    const filteredEvents = allEvents.filter(event =>
+            event.requiredSkills.some(skill =>
+                    userSkills.includes(skill.toLowerCase())
+            )
+    );
+
+    // Log filtered events for debugging
+    console.log('Filtered Events:', filteredEvents);
+
+    // Display the filtered events
+    displayEvents(filteredEvents);
+  }
+
   // Function to display events in the HTML
   function displayEvents(events) {
     const eventsList = document.getElementById('events-list');
     eventsList.innerHTML = ''; // Clear the current content
 
     if (events.length === 0) {
-      eventsList.innerHTML = '<p>No events available</p>';
+      eventsList.innerHTML = '<p>No events available based on your skills.</p>';
       return;
     }
 

@@ -1,6 +1,6 @@
 // #file: controllers/eventController.js
 const Event = require('../models/EventManagement');
-
+const UserProfile = require('../models/UserProfile');
 // Create a new event
 exports.createEvent = async (req, res) => {
     try {
@@ -68,5 +68,37 @@ exports.deleteEvent = async (req, res) => {
         res.status(200).json({ message: 'Event deleted successfully' });
     } catch (error) {
         res.status(400).json({ message: 'Error deleting event', error: error.message });
+    }
+};
+
+
+
+exports.getFilteredEventsBySkills = async (req, res) => {
+    try {
+        // Ensure user is authenticated and retrieve their ID from the request
+        if (!req.user || !req.user._id) {
+            return res.status(400).json({ message: 'User not authenticated' });
+        }
+
+        const userId = req.user._id;  // Assuming user ID is available in req.user after JWT authentication
+
+        // Fetch user's profile
+        const userProfile = await UserProfile.findOne({ userId });
+        if (!userProfile) {
+            return res.status(404).json({ message: 'User profile not found' });
+        }
+
+        // Get user's skills
+        const userSkills = userProfile.skills;
+
+        // Find events where requiredSkills overlap with user's skills
+        const events = await Event.find({
+            requiredSkills: { $in: userSkills }  // Match events that require any of the user's skills
+        });
+
+        res.status(200).json(events);
+    } catch (error) {
+        console.error(error);
+        res.status(400).json({ message: 'Error fetching filtered events', error: error.message });
     }
 };
