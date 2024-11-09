@@ -85,3 +85,20 @@ exports.authenticateJWT = (req, res, next) => {
         res.sendStatus(401); // No token found
     }
 };
+
+exports.getUserRole = (req, res) => {
+    // Check if the user is authenticated by using the existing JWT token
+    const authHeader = req.headers.authorization;
+    if (authHeader) {
+        const token = authHeader.split(' ')[1];
+        try {
+            // Verify the token using the secret key
+            const decoded = jwt.verify(token, SECRET_KEY);
+            res.json({ role: decoded.role });
+        } catch (err) {
+            res.status(403).send('Invalid token');
+        }
+    } else {
+        res.status(401).send('No token provided');
+    }
+};

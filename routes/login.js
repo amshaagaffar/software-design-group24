@@ -45,6 +45,6 @@ router.get('/api/events', eventController.getAllEvents);
 router.get('/api/events/:id', eventController.getEventById);
 router.put('/api/events/:id', eventController.updateEvent);
 router.delete('/api/events/:id', eventController.deleteEvent);
-
+router.get('/getRole', loginController.authenticateJWT, loginController.getUserRole);
 
 module.exports = router;

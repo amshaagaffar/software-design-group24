@@ -12,20 +12,12 @@
 <body>
 <header>
     <nav>
-        <div class="logo">
-            Hands2Help
-        </div>
-
+        <div class="logo">Hands2Help</div>
         <div class="menu-container">
-            <div class="menu">
-
-                <a href="userprofileview.html">Account</a>
-            </div>
-
+            <div class="menu"></div> <!-- The menu will be populated dynamically -->
             <button class="noti" id="notification-button">
                 <img src="resources/notification-newdot-line.svg" alt="Notification" class="noti-button">
             </button>
-
             <button id="signout-button" onclick="signOut()" class="signout-button">Sign Out</button>
         </div>
     </nav>
@@ -92,6 +84,71 @@
                 console.error('Error:', error);
             });
     });
+</script>
+<!-- SIGN OUT LOGIC -->
+<script>
+    function signOut() {
+        localStorage.removeItem('token'); // Remove token from localStorage
+        alert('You have been signed out.');
+        window.location.href = 'Login.html'; // Redirect to login page
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // No default section to load on page load
+    });
+</script>
+<!--Dash-->
+<script>
+    async function fetchUserRole() {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            console.error('No token found');
+            return;
+        }
+
+        try {
+            const response = await fetch('/getRole', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                return data.role;
+            } else {
+                console.error('Failed to fetch role');
+                return null;
+            }
+        } catch (err) {
+            console.error('Error fetching role:', err);
+            return null;
+        }
+    }
+
+    async function updateNavBasedOnRole() {
+        const role = await fetchUserRole();
+
+        const menuContainer = document.querySelector('.menu');
+
+        if (role === 'admin') {
+            menuContainer.innerHTML += `
+        <a href="admin_dashboard.html">Dashboard</a>
+      `;
+        } else if (role === 'volunteer') {
+            menuContainer.innerHTML += `
+        <a href="user_dashboard.html">Dashboard</a>
+      `;
+        } else {
+            menuContainer.innerHTML += `
+        <a href="Home.html">Home</a>
+      `;
+        }
+    }
+
+    // Run the function to update the navigation on page load
+    document.addEventListener('DOMContentLoaded', updateNavBasedOnRole);
 </script>
 </body>
 </html>
