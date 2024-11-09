@@ -3,70 +3,89 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Filtered Events by Skills</title>
-  <link rel="stylesheet" href="styles.css">
-  <script defer src="myscripts.js"></script>
+  <title>Event List</title>
+  <style>
+    .event {
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin: 10px 0;
+    }
+
+    .no-events {
+      color: red;
+      font-style: italic;
+    }
+  </style>
 </head>
 <body>
-<div class="container">
-  <h1>Filtered Events by Skills</h1>
+<h1>Event List</h1>
 
-  <!-- Input for user skills -->
-  <label for="userSkills">Enter your skills (comma separated):</label>
-  <input type="text" id="userSkills" placeholder="e.g., JavaScript, Python, HTML">
-  <button onclick="filterEventsBySkills()">Filter Events</button>
-
-  <div id="events-list"></div> <!-- This is where events will be dynamically added -->
+<!-- Container to display events -->
+<div id="events-container">
+  <!-- Events will be loaded here -->
 </div>
 
 <script>
-  // Variable to store all fetched events
   let allEvents = [];
+  let userSkills = [];
 
-  // Fetch all events from the server
-  async function fetchEvents() {
+  // Function to fetch all events from the backend
+  async function loadAllEvents() {
     try {
-      const response = await fetch('/api/events');
-      if (response.ok) {
-        allEvents = await response.json();
-        displayEvents(allEvents);  // Display all events initially
-      } else {
-        console.error('Error fetching events:', response.statusText);
+      const response = await fetch('http://localhost:3000/api/events', {
+        headers: {
+          'Authorization': 'Bearer ' + localStorage.getItem('token') // Ensure the token is passed
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Error fetching events');
       }
+
+      allEvents = await response.json();
+      filterAndDisplayEvents();  // Filter events after fetching them
     } catch (error) {
-      console.error('Error:', error);
+      console.error('Error fetching events:', error);
     }
   }
 
-  // Filter events by user's skills
-  function filterEventsBySkills() {
-    const userSkillsInput = document.getElementById('userSkills').value;
-    const userSkills = userSkillsInput.split(',').map(skill => skill.trim().toLowerCase());
+  // Function to fetch the logged-in user's profile (including skills)
+  async function loadUserProfile() {
+    try {
+      const response = await fetch('http://localhost:3000/userprofile', {
+        headers: {
+          'Authorization': 'Bearer ' + localStorage.getItem('token') // Assuming token is in localStorage
+        }
+      });
 
-    // Log the user skills to ensure they're formatted correctly
-    console.log('User Skills:', userSkills);
+      if (!response.ok) {
+        throw new Error('Error fetching user profile');
+      }
 
-    // Filter events based on matching skills
-    const filteredEvents = allEvents.filter(event =>
-            event.requiredSkills.some(skill =>
-                    userSkills.includes(skill.toLowerCase())
-            )
-    );
-
-    // Log filtered events for debugging
-    console.log('Filtered Events:', filteredEvents);
-
-    // Display the filtered events
-    displayEvents(filteredEvents);
+      const userProfile = await response.json();
+      userSkills = userProfile.skills || [];  // Get skills from the user's profile, default to empty array
+      loadAllEvents();  // Load all events after fetching the user profile
+    } catch (error) {
+      console.error('Error fetching user profile:', error);
+    }
   }
 
-  // Function to display events in the HTML
+  // Function to filter and display events based on user skills
+  function filterAndDisplayEvents() {
+    const filteredEvents = allEvents.filter(event => {
+      return event.requiredSkills.some(skill => userSkills.includes(skill));  // Match at least one skill
+    });
+
+    displayEvents(filteredEvents);  // Display the filtered events
+  }
+
+  // Function to display events on the page
   function displayEvents(events) {
-    const eventsList = document.getElementById('events-list');
-    eventsList.innerHTML = ''; // Clear the current content
+    const eventsContainer = document.getElementById('events-container');
+    eventsContainer.innerHTML = '';  // Clear the current events displayed
 
     if (events.length === 0) {
-      eventsList.innerHTML = '<p>No events available based on your skills.</p>';
+      eventsContainer.innerHTML = '<p class="no-events">No events found matching your skills.</p>';
       return;
     }
 
@@ -74,19 +93,30 @@
       const eventDiv = document.createElement('div');
       eventDiv.classList.add('event');
       eventDiv.innerHTML = `
-                    <h3>${event.eventName}</h3>
-                    <p><strong>Description:</strong> ${event.eventDescription}</p>
-                    <p><strong>Location:</strong> ${event.location}</p>
-                    <p><strong>Skills Required:</strong> ${event.requiredSkills.join(', ')}</p>
-                    <p><strong>Urgency:</strong> ${event.urgency}</p>
-                    <p><strong>Event Date:</strong> ${new Date(event.eventDate).toLocaleDateString()}</p>
+                    <h2>${event.eventName}</h2>
+                    <p>${event.eventDescription}</p>
+                    <p>Location: ${event.location}</p>
+                    <p>Skills: ${event.requiredSkills.join(', ')}</p>
+                    <p>Urgency: ${event.urgency}</p>
+                    <p>Date: ${formatDate(event.eventDate)}</p>
                 `;
-      eventsList.appendChild(eventDiv);
+      eventsContainer.appendChild(eventDiv);
     });
   }
 
-  // Fetch and display the events when the page loads
-  window.onload = fetchEvents;
+  // Function to format event date to a more user-friendly format
+  function formatDate(dateString) {
+    const date = new Date(dateString);
+    return date.toLocaleDateString(); // Customize the format if needed
+  }
+
+  // Function to initialize the page by loading events and user profile
+  async function initializePage() {
+    await loadUserProfile(); // Load user profile and skills
+  }
+
+  // Load everything when the page is loaded
+  window.onload = initializePage;
 </script>
 </body>
 </html>

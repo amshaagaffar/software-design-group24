@@ -1,4 +1,3 @@
-// #file: models/EventManagement.js
 const mongoose = require('mongoose');
 
 // Define the schema for event management
