@@ -1,54 +1,32 @@
-const volunteerSchema = new mongoose.Schema({
-    name: {
-        type: String,
-        required: true,
-        trim: true
-    },
-    skills: {
-        type: String,
-        required: false // Optional
-    },
-    availability: {
-        type: Date,
-        required: false // Optional
-    }
-});
-
-module.exports = mongoose.model('Volunteer', volunteerSchema);
-
-const eventSchema = new mongoose.Schema({
-    name: {
-        type: String,
-        required: true,
-        trim: true
-    },
-    requirements: {
-        type: String,
-        required: false // Optional
-    },
-    date: {
-        type: Date,
-        required: false // Optional
-    }
-});
-
-module.exports = mongoose.model('Event', eventSchema);
+const mongoose = require('mongoose');
 
 const volunteerHistorySchema = new mongoose.Schema({
-    volunteerName: {
-        type: String,
-        required: true,
-        trim: true
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'UserCredentials',
+        required: true
     },
-    matchedEvent: {
-        type: String,
-        required: true,
-        trim: true
+    eventId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Event',
+        required: true
     },
-    date: {
+    signupDate: {
         type: Date,
-        default: Date.now // Auto set to the current date
+        default: Date.now
+    },
+    status: {
+        type: String,
+        enum: ['signed_up', 'completed', 'cancelled'],
+        default: 'signed_up'
+    },
+    feedback: {
+        type: String
+    },
+    hoursServed: {
+        type: Number
     }
 });
 
-module.exports = mongoose.model('VolunteerHistory', volunteerHistorySchema);
+const VolunteerHistory = mongoose.model('VolunteerHistory', volunteerHistorySchema);
+module.exports = VolunteerHistory;

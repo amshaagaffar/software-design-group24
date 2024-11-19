@@ -1,5 +1,3 @@
-<!-- #file:volunteerhistory.html -->
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,13 +6,77 @@
     <title>Volunteer History</title>
     <link rel="stylesheet" href="Styles.css">
     <link rel="stylesheet" href="styles2.css">
+    <style>
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            font-weight: bold;
+        }
+        .status-signed_up {
+            background-color: #007bff;
+            color: white;
+        }
+        .status-completed {
+            background-color: #28a745;
+            color: white;
+        }
+        .status-cancelled {
+            background-color: #dc3545;
+            color: white;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+        }
+        .action-button {
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            border: none;
+        }
+        .cancel-button {
+            background-color: #dc3545;
+            color: white;
+        }
+        .complete-button {
+            background-color: #28a745;
+            color: white;
+        }
+        .feedback-button {
+            background-color: #17a2b8;
+            color: white;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        .modal-content {
+            background-color: white;
+            margin: 15% auto;
+            padding: 20px;
+            border-radius: 5px;
+            width: 80%;
+            max-width: 500px;
+        }
+        .close {
+            float: right;
+            cursor: pointer;
+            font-size: 1.5em;
+        }
+    </style>
 </head>
 <body>
 <header>
     <nav>
         <div class="logo">Hands2Help</div>
         <div class="menu-container">
-            <div class="menu"></div> <!-- The menu will be populated dynamically -->
+            <div class="menu"></div>
             <button class="noti" id="notification-button">
                 <img src="resources/notification-newdot-line.svg" alt="Notification" class="noti-button">
             </button>
@@ -28,12 +90,12 @@
     <thead>
     <tr>
         <th>Event Name</th>
-        <th>Event Description</th>
-        <th>Location</th>
-        <th>Required Skills</th>
-        <th>Urgency</th>
         <th>Event Date</th>
-        <th>Participation Status</th>
+        <th>Location</th>
+        <th>Status</th>
+        <th>Sign-up Date</th>
+        <th>Hours Served</th>
+        <th>Actions</th>
     </tr>
     </thead>
     <tbody id="volunteer-history">
@@ -41,64 +103,174 @@
     </tbody>
 </table>
 
+<!-- Feedback Modal -->
+<div id="feedbackModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Provide Feedback</h2>
+        <input type="hidden" id="currentHistoryId">
+        <textarea id="feedbackText" rows="4" style="width: 100%; margin: 10px 0;"></textarea>
+        <input type="number" id="hoursServed" placeholder="Hours served" style="width: 100%; margin: 10px 0;">
+        <button onclick="submitFeedback()" class="action-button complete-button">Submit Feedback</button>
+    </div>
+</div>
+
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    let modal = document.getElementById('feedbackModal');
+    let span = document.getElementsByClassName('close')[0];
+
+    span.onclick = function() {
+        modal.style.display = "none";
+    }
+
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    }
+
+    async function loadVolunteerHistory() {
         const token = localStorage.getItem('token');
 
         if (!token) {
-            window.location.href = '/login.html'; // Redirect to login if no token
+            alert('You must be logged in to view this page.');
+            window.location.href = '/login.html';
             return;
         }
 
-        fetch('/volunteerhistory', {
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.message) {
-                    alert(data.message);
-                    return;
+        try {
+            const response = await fetch('http://localhost:3000/api/volunteer-history', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
                 }
-
-                const tbody = document.getElementById("volunteer-history");
-
-                data.forEach(event => {
-                    const row = document.createElement("tr");
-
-                    row.innerHTML = `
-                        <td>${event.eventName}</td>
-                        <td>${event.eventDescription}</td>
-                        <td>${event.location}</td>
-                        <td>${event.requiredSkills.join(", ")}</td>
-                        <td>${event.urgency}</td>
-                        <td>${event.eventDate}</td>
-                        <td>${event.participationStatus}</td>
-                    `;
-
-                    tbody.appendChild(row);
-                });
-            })
-            .catch(error => {
-                console.error('Error:', error);
             });
-    });
-</script>
-<!-- SIGN OUT LOGIC -->
-<script>
-    function signOut() {
-        localStorage.removeItem('token'); // Remove token from localStorage
-        alert('You have been signed out.');
-        window.location.href = 'Login.html'; // Redirect to login page
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch volunteer history');
+            }
+
+            const data = await response.json();
+            displayVolunteerHistory(data);
+        } catch (error) {
+            console.error('Error fetching volunteer history:', error);
+            alert('Unable to fetch volunteer history at this time. Please try again later.');
+        }
     }
 
-    document.addEventListener('DOMContentLoaded', function() {
-        // No default section to load on page load
-    });
-</script>
-<!--Dash-->
-<script>
+    function displayVolunteerHistory(history) {
+        const tbody = document.getElementById('volunteer-history');
+        tbody.innerHTML = '';
+
+        if (!history.length) {
+            tbody.innerHTML = '<tr><td colspan="7">No volunteer history found.</td></tr>';
+            return;
+        }
+
+        history.forEach(record => {
+            const row = document.createElement('tr');
+            const event = record.eventId;
+
+            row.innerHTML = `
+                <td>${event.eventName}</td>
+                <td>${new Date(event.eventDate).toLocaleDateString()}</td>
+                <td>${event.location}</td>
+                <td><span class="status-badge status-${record.status}">${record.status}</span></td>
+                <td>${new Date(record.signupDate).toLocaleDateString()}</td>
+                <td>${record.hoursServed || '-'}</td>
+                <td class="action-buttons">
+                    ${getActionButtons(record)}
+                </td>
+            `;
+
+            tbody.appendChild(row);
+        });
+    }
+
+    function getActionButtons(record) {
+        if (record.status === 'signed_up') {
+            return `
+                <button onclick="cancelSignup('${record._id}')" class="action-button cancel-button">Cancel</button>
+                <button onclick="openFeedbackModal('${record._id}')" class="action-button complete-button">Complete</button>
+            `;
+        } else if (record.status === 'completed') {
+            return `
+                <button onclick="openFeedbackModal('${record._id}')" class="action-button feedback-button">Update Feedback</button>
+            `;
+        }
+        return '';
+    }
+
+    async function cancelSignup(historyId) {
+        if (!confirm('Are you sure you want to cancel this event signup?')) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`http://localhost:3000/api/volunteer-history/${historyId}/cancel`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (response.ok) {
+                alert('Successfully cancelled event signup');
+                loadVolunteerHistory();
+            } else {
+                throw new Error('Failed to cancel signup');
+            }
+        } catch (error) {
+            console.error('Error cancelling signup:', error);
+            alert('Failed to cancel signup. Please try again later.');
+        }
+    }
+
+    function openFeedbackModal(historyId) {
+        document.getElementById('currentHistoryId').value = historyId;
+        document.getElementById('feedbackText').value = '';
+        document.getElementById('hoursServed').value = '';
+        modal.style.display = "block";
+    }
+
+    async function submitFeedback() {
+        const historyId = document.getElementById('currentHistoryId').value;
+        const feedback = document.getElementById('feedbackText').value;
+        const hoursServed = document.getElementById('hoursServed').value;
+
+        try {
+            const response = await fetch(`http://localhost:3000/api/volunteer-history/${historyId}`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    status: 'completed',
+                    feedback,
+                    hoursServed: Number(hoursServed)
+                })
+            });
+
+            if (response.ok) {
+                alert('Successfully updated volunteer record');
+                modal.style.display = "none";
+                loadVolunteerHistory();
+            } else {
+                throw new Error('Failed to update record');
+            }
+        } catch (error) {
+            console.error('Error updating record:', error);
+            alert('Failed to update record. Please try again later.');
+        }
+    }
+
+    function signOut() {
+        localStorage.removeItem('token');
+        alert('You have been signed out.');
+        window.location.href = '/login.html';
+    }
+
     async function fetchUserRole() {
         const token = localStorage.getItem('token');
         if (!token) {
@@ -129,26 +301,27 @@
 
     async function updateNavBasedOnRole() {
         const role = await fetchUserRole();
-
         const menuContainer = document.querySelector('.menu');
 
         if (role === 'admin') {
             menuContainer.innerHTML += `
-        <a href="admin_dashboard.html">Dashboard</a>
-      `;
+                <a href="admin_dashboard.html">Dashboard</a>
+                <a href="event_list.html">Events</a>
+            `;
         } else if (role === 'volunteer') {
             menuContainer.innerHTML += `
-        <a href="user_dashboard.html">Dashboard</a>
-      `;
+                <a href="user_dashboard.html">Dashboard</a>
+                <a href="volunteerhistory.html">My History</a>
+            `;
         } else {
-            menuContainer.innerHTML += `
-        <a href="Home.html">Home</a>
-      `;
+            menuContainer.innerHTML += `<a href="Home.html">Home</a>`;
         }
     }
 
-    // Run the function to update the navigation on page load
-    document.addEventListener('DOMContentLoaded', updateNavBasedOnRole);
+    document.addEventListener('DOMContentLoaded', () => {
+        updateNavBasedOnRole();
+        loadVolunteerHistory();
+    });
 </script>
 </body>
 </html>

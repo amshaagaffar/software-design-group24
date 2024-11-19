@@ -2,7 +2,8 @@ const express = require('express');
 const router = express.Router();
 const loginController = require('../controllers/loginController');
 const userProfileController = require('../controllers/userProfileController'); // Import the user profile controller
-const eventController = require('../controllers/eventController'); // Import the event controller
+const eventController = require('../controllers/eventController');
+const volunteerHistoryController = require('../controllers/volunteerHistoryController');// Import the event controller
 const path = require('path');
 
 // Serve the login page
@@ -46,5 +47,25 @@ router.get('/api/events/:id', eventController.getEventById);
 router.put('/api/events/:id', eventController.updateEvent);
 router.delete('/api/events/:id', eventController.deleteEvent);
 router.get('/getRole', loginController.authenticateJWT, loginController.getUserRole);
+
+router.post('/api/events/:eventId/signup',
+    loginController.authenticateJWT,
+    volunteerHistoryController.signUpForEvent
+);
+
+router.get('/api/volunteer-history',
+    loginController.authenticateJWT,
+    volunteerHistoryController.getUserVolunteerHistory
+);
+
+router.put('/api/volunteer-history/:historyId',
+    loginController.authenticateJWT,
+    volunteerHistoryController.updateVolunteerStatus
+);
+
+router.put('/api/volunteer-history/:historyId/cancel',
+    loginController.authenticateJWT,
+    volunteerHistoryController.cancelEventSignup
+);
 
 module.exports = router;

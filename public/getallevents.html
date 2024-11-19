@@ -10,31 +10,55 @@
       padding: 10px;
       margin: 10px 0;
     }
-
     .no-events {
       color: red;
       font-style: italic;
     }
+    .signup-button {
+      padding: 8px 16px;
+      background-color: #5b00ff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .signup-button:disabled {
+      background-color: #cccccc;
+      cursor: not-allowed;
+    }
+    .already-signed {
+      background-color: #808080;
+    }
   </style>
+  <link rel="stylesheet" href="Styles.css">
 </head>
 <body>
+<header>
+  <nav>
+    <div class="logo">Hands2Help</div>
+    <div class="menu-container">
+      <div class="menu"></div>
+      <button class="noti" id="notification-button">
+        <img src="resources/notification-newdot-line.svg" alt="Notification" class="noti-button">
+      </button>
+      <button id="signout-button" onclick="signOut()" class="signout-button">Sign Out</button>
+    </div>
+  </nav>
+</header>
 <h1>Event List</h1>
 
-<!-- Container to display events -->
-<div id="events-container">
-  <!-- Events will be loaded here -->
-</div>
+<div id="events-container"></div>
 
 <script>
   let allEvents = [];
   let userSkills = [];
+  let userSignups = new Set(); // Track events user has already signed up for
 
-  // Function to fetch all events from the backend
   async function loadAllEvents() {
     try {
       const response = await fetch('http://localhost:3000/api/events', {
         headers: {
-          'Authorization': 'Bearer ' + localStorage.getItem('token') // Ensure the token is passed
+          'Authorization': 'Bearer ' + localStorage.getItem('token')
         }
       });
 
@@ -43,18 +67,37 @@
       }
 
       allEvents = await response.json();
-      filterAndDisplayEvents();  // Filter events after fetching them
+      await loadUserSignups(); // Load user's existing signups before displaying events
+      filterAndDisplayEvents();
     } catch (error) {
       console.error('Error fetching events:', error);
     }
   }
 
-  // Function to fetch the logged-in user's profile (including skills)
+  async function loadUserSignups() {
+    try {
+      const response = await fetch('http://localhost:3000/api/volunteer-history', {
+        headers: {
+          'Authorization': 'Bearer ' + localStorage.getItem('token')
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Error fetching volunteer history');
+      }
+
+      const history = await response.json();
+      userSignups = new Set(history.map(h => h.eventId._id));
+    } catch (error) {
+      console.error('Error fetching volunteer history:', error);
+    }
+  }
+
   async function loadUserProfile() {
     try {
       const response = await fetch('http://localhost:3000/userprofile', {
         headers: {
-          'Authorization': 'Bearer ' + localStorage.getItem('token') // Assuming token is in localStorage
+          'Authorization': 'Bearer ' + localStorage.getItem('token')
         }
       });
 
@@ -63,26 +106,24 @@
       }
 
       const userProfile = await response.json();
-      userSkills = userProfile.skills || [];  // Get skills from the user's profile, default to empty array
-      loadAllEvents();  // Load all events after fetching the user profile
+      userSkills = userProfile.skills || [];
+      loadAllEvents();
     } catch (error) {
       console.error('Error fetching user profile:', error);
     }
   }
 
-  // Function to filter and display events based on user skills
   function filterAndDisplayEvents() {
     const filteredEvents = allEvents.filter(event => {
-      return event.requiredSkills.some(skill => userSkills.includes(skill));  // Match at least one skill
+      return event.requiredSkills.some(skill => userSkills.includes(skill));
     });
 
-    displayEvents(filteredEvents);  // Display the filtered events
+    displayEvents(filteredEvents);
   }
 
-  // Function to display events on the page
   function displayEvents(events) {
     const eventsContainer = document.getElementById('events-container');
-    eventsContainer.innerHTML = '';  // Clear the current events displayed
+    eventsContainer.innerHTML = '';
 
     if (events.length === 0) {
       eventsContainer.innerHTML = '<p class="no-events">No events found matching your skills.</p>';
@@ -92,31 +133,115 @@
     events.forEach(event => {
       const eventDiv = document.createElement('div');
       eventDiv.classList.add('event');
+
+      const isSignedUp = userSignups.has(event._id);
+      const signupButtonClass = isSignedUp ? 'signup-button already-signed' : 'signup-button';
+      const buttonText = isSignedUp ? 'Already Signed Up' : 'Sign Up';
+
       eventDiv.innerHTML = `
-                    <h2>${event.eventName}</h2>
-                    <p>${event.eventDescription}</p>
-                    <p>Location: ${event.location}</p>
-                    <p>Skills: ${event.requiredSkills.join(', ')}</p>
-                    <p>Urgency: ${event.urgency}</p>
-                    <p>Date: ${formatDate(event.eventDate)}</p>
-                `;
+        <h2>${event.eventName}</h2>
+        <p>${event.eventDescription}</p>
+        <p>Location: ${event.location}</p>
+        <p>Skills: ${event.requiredSkills.join(', ')}</p>
+        <p>Urgency: ${event.urgency}</p>
+        <p>Date: ${formatDate(event.eventDate)}</p>
+        <button class="${signupButtonClass}"
+                onclick="signUpForEvent('${event._id}')"
+                ${isSignedUp ? 'disabled' : ''}>
+          ${buttonText}
+        </button>
+      `;
       eventsContainer.appendChild(eventDiv);
     });
   }
 
-  // Function to format event date to a more user-friendly format
   function formatDate(dateString) {
     const date = new Date(dateString);
-    return date.toLocaleDateString(); // Customize the format if needed
+    return date.toLocaleDateString();
   }
 
-  // Function to initialize the page by loading events and user profile
+  async function signUpForEvent(eventId) {
+    if (!eventId) {
+      console.error('Event ID is undefined.');
+      alert('Invalid event selected.');
+      return;
+    }
+
+    try {
+      const response = await fetch(`http://localhost:3000/api/events/${eventId}/signup`, {
+        method: 'POST',
+        headers: {
+          'Authorization': 'Bearer ' + localStorage.getItem('token'),
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (response.ok) {
+        alert('Successfully signed up for the event!');
+        await loadUserSignups(); // Reload user's signups
+        filterAndDisplayEvents(); // Refresh the display
+      } else {
+        const error = await response.json();
+        alert(error.message || 'Failed to sign up for the event');
+      }
+    } catch (error) {
+      console.error('Error signing up for the event:', error);
+      alert('An error occurred while signing up for the event');
+    }
+  }
+
   async function initializePage() {
-    await loadUserProfile(); // Load user profile and skills
+    await loadUserProfile();
   }
 
-  // Load everything when the page is loaded
   window.onload = initializePage;
+
+  async function fetchUserRole() {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      console.error('No token found');
+      return;
+    }
+
+    try {
+      const response = await fetch('/getRole', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        return data.role;
+      } else {
+        console.error('Failed to fetch role');
+        return null;
+      }
+    } catch (err) {
+      console.error('Error fetching role:', err);
+      return null;
+    }
+  }
+
+  async function updateNavBasedOnRole() {
+    const role = await fetchUserRole();
+    const menuContainer = document.querySelector('.menu');
+
+    if (role === 'admin') {
+      menuContainer.innerHTML += `<a href="admin_dashboard.html">Dashboard</a>`;
+    } else if (role === 'volunteer') {
+      menuContainer.innerHTML += `
+        <a href="user_dashboard.html">Dashboard</a>
+        <a href="volunteerhistory.html">My Volunteer History</a>
+      `;
+    } else {
+      menuContainer.innerHTML += `<a href="Home.html">Home</a>`;
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', updateNavBasedOnRole);
 </script>
+
 </body>
 </html>
