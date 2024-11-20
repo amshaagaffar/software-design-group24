@@ -72,30 +72,6 @@ exports.deleteEvent = async (req, res) => {
 };
 
 
-exports.signUpForEvent = async (req, res) => {
-    try {
-        const eventId = req.params.id;
-        const userId = req.user.userId; // Get user ID from the JWT token
 
-        // Find the event
-        const event = await Event.findById(eventId);
-        if (!event) {
-            return res.status(404).json({ message: 'Event not found' });
-        }
-
-        // Check if user is already signed up for the event
-        if (event.volunteers.includes(userId)) {
-            return res.status(400).json({ message: 'You are already signed up for this event' });
-        }
-
-        // Add user to event's volunteer list
-        event.volunteers.push(userId);
-        await event.save();
-
-        res.status(200).json({ message: 'Successfully signed up for the event' });
-    } catch (error) {
-        res.status(500).json({ message: 'Error signing up for event', error: error.message });
-    }
-};
 
 
