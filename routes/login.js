@@ -3,7 +3,8 @@ const router = express.Router();
 const loginController = require('../controllers/loginController');
 const userProfileController = require('../controllers/userProfileController'); // Import the user profile controller
 const eventController = require('../controllers/eventController');
-const volunteerHistoryController = require('../controllers/volunteerHistoryController');// Import the event controller
+const volunteerHistoryController = require('../controllers/volunteerHistoryController');
+const notificationController = require('../controllers/NotificationController')// Import the event controller
 const path = require('path');
 
 // Serve the login page
@@ -66,6 +67,12 @@ router.put('/api/volunteer-history/:historyId',
 router.put('/api/volunteer-history/:historyId/cancel',
     loginController.authenticateJWT,
     volunteerHistoryController.cancelEventSignup
+);
+
+
+router.get('/api/notifications/reminders',
+    loginController.authenticateJWT, // Ensure the user is authenticated
+    notificationController.sendEventReminder
 );
 
 module.exports = router;

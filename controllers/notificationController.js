@@ -1,26 +1,41 @@
-// Hardcoded notification data
-let notifications = [
-    { id: '1', userId: 'user1', message: 'Event A is coming soon!', isRead: false, timestamp: Date.now() },
-    { id: '2', userId: 'user1', message: 'Your profile was updated successfully.', isRead: false, timestamp: Date.now() },
-    { id: '3', userId: 'user2', message: 'Event B has been canceled.', isRead: false, timestamp: Date.now() },
-];
+const VolunteerHistory = require('../models/VolunteerHistory');
+const Event = require('../models/EventManagement');
 
-// Function to get notifications for a user
-exports.getNotifications = (req, res) => {
-    const userId = req.userId; // Assuming you get userId from JWT
-    const userNotifications = notifications.filter(notification => notification.userId === userId);
-    res.json(userNotifications);
-};
+exports.sendEventReminder = async (req, res) => {
+    try {
+        const userId = req.user.userId; // Extract the user ID from the authenticated request
 
-// Function to mark notifications as read
-exports.markAsRead = (req, res) => {
-    const notificationId = req.params.id;
-    const notification = notifications.find(n => n.id === notificationId);
+        // Fetch upcoming events the user is signed up for
+        const today = new Date();
+        const reminders = await VolunteerHistory.find({
+            userId,
+            status: 'signed_up' // Only fetch events where the user is signed up
+        })
+            .populate({
+                path: 'eventId',
+                match: { eventDate: { $gte: today } }, // Only events happening in the future
+                select: 'eventName eventDate location' // Only include these fields
+            });
 
-    if (notification) {
-        notification.isRead = true;
-        res.json({ message: 'Notification marked as read' });
-    } else {
-        res.status(404).json({ error: 'Notification not found' });
+        // Filter out entries where the populated eventId is null (past events or invalid data)
+        const upcomingEvents = reminders.filter(entry => entry.eventId);
+
+        // Format the response
+        const reminderDetails = upcomingEvents.map(entry => ({
+            eventName: entry.eventId.eventName,
+            eventDate: entry.eventId.eventDate,
+            location: entry.eventId.location
+        }));
+
+        res.status(200).json({
+            message: 'Upcoming event reminders fetched successfully',
+            reminders: reminderDetails
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            message: 'Error fetching event reminders',
+            error: error.message
+        });
     }
 };
