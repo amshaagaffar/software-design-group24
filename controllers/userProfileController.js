@@ -30,7 +30,7 @@ exports.createOrUpdateUserProfile = async (req, res) => {
             city: req.body.city,
             state: req.body.state,
             zipcode: req.body.zipcode,
-            skills: req.body.skills.split(','), // Convert skills from comma-separated string to array
+            skills: req.body.skills, // Directly use the array sent from the frontend
             preferences: req.body.preferences,
             availability: req.body.availability
         };

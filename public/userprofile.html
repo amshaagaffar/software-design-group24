@@ -213,6 +213,10 @@
   async function saveProfile(event) {
     event.preventDefault();
 
+    // Collect all selected skills as an array
+    const selectedSkills = Array.from(document.getElementById('skills').selectedOptions)
+            .map(option => option.value);
+
     const profileData = {
       fullName: document.getElementById('fullName').value,
       address1: document.getElementById('address1').value,
@@ -220,7 +224,7 @@
       city: document.getElementById('city').value,
       state: document.getElementById('state').value,
       zipcode: document.getElementById('zipcode').value,
-      skills: document.getElementById('skills').value,
+      skills: selectedSkills,  // Send the array of selected skills
       preferences: document.getElementById('preferences').value,
       availability: document.getElementById('availability').value
     };
